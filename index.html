@@ -19,30 +19,38 @@
                 <v-toolbar-title>Contatos</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-dialog v-model="adicionarContato.mostrarDialogo" width="50vw">
-									<template v-slot:activator="{ on, attrs }">
-										<v-btn color="primary" dark fab v-bind="attrs" v-on="on"><v-icon dark>mdi-plus</v-icon></v-btn>
-									</template>
-									<v-card>
-										<v-card-title>Adicionar contato</v-card-title>
-										<v-card-text>
-											<v-container>
-												<v-row>
-													<v-col cols="12" md="6">
-														<v-text-field v-model="adicionarContato.nome" label="Nome"></v-text-field>
-													</v-col>
-													<v-col cols="12" md="6">
-														<v-text-field v-model="adicionarContato.telefone" label="Telefone"></v-text-field>
-													</v-col>
-												</v-row>
-											</v-container>
-										</v-card-text>
-										<v-card-actions>
-											<v-spacer></v-spacer>
-											<v-btn>Cancelar</v-btn>
-											<v-btn color="primary" dark>Adicionar</v-btn>
-										</v-card-actions>
-									</v-card>
-								</v-dialog>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn color="primary" dark fab v-bind="attrs" v-on="on">
+                      <v-icon dark>mdi-plus</v-icon>
+                    </v-btn>
+                  </template>
+                  <v-card>
+                    <v-card-title>Adicionar contato</v-card-title>
+                    <v-card-text>
+                      <v-container>
+                        <v-form ref="formAdicionarContato" v-model="adicionarContato.dadosValidos">
+                          <v-row>
+                            <v-col cols="12" md="6">
+                              <v-text-field v-model="adicionarContato.dados.nome" label="Nome"
+                                :rules="adicionarContato.regrasNome" required></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                              <v-text-field v-model="adicionarContato.dados.telefone" label="Telefone"
+                                :rules="adicionarContato.regrasTelefone" required v-mask="'(##) ####-####'">
+                              </v-text-field>
+                            </v-col>
+                          </v-row>
+                        </v-form>
+                      </v-container>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn @click="adicionarContato.mostrarDialogo = false">Cancelar</v-btn>
+                      <v-btn color="primary" :disabled="!adicionarContato.dadosValidos" @click="salvarContato">Adicionar
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
               </v-toolbar>
             </template>
             <template v-slot:item.actions="{ item }">
@@ -64,7 +72,9 @@
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/v-mask/dist/v-mask.min.js"></script>
   <script>
+    Vue.use(VueMask.VueMaskPlugin);
     var app = new Vue({
       el: '#app',
       vuetify: new Vuetify(),
@@ -75,15 +85,44 @@
           { text: 'Telefone', value: 'telefone' },
           { value: 'actions', sortable: false }
         ],
-        adicionarContato: {
-					mostrarDialogo: false,
-					nome: null,
-					telefone: null
-				}
+        edicaoContato: {
+          novoContato: true,
+          mostrarDialogo: false,
+          regrasNome: [
+            nome => !!nome || "Campo obrigatório",
+            nome => (nome && nome.split(" ").filter(n => /^[a-zA-Z]{3,}$/.test(n)).length >= 2) || "O nome deve conter ao menos duas palavras de pelo menos 3 caracteres cada",
+            nome => (nome && nome.length <= 100) || "O nome deve ser conter menos de 100 caracteres"
+          ],
+          regrasTelefone: [
+            telefone => !!telefone || "Campo obrigatório",
+            telefone => (telefone && /^\(\d{2}\) \d{4}-\d{4}$/.test(telefone)) || "O telefone deve ter o formato (99) 9999-9999"
+          ],
+          dadosValidos: false,
+          dados: {
+            nome: null,
+            telefone: null
+          }
+        }
+      },
+      watch: {
+        "adicionarContato.mostrarDialogo": function (mostrar) {
+          if (mostrar) {
+            this.adicionarContato.dados = {
+              nome: null,
+              telefone: null
+            };
+
+            this.$nextTick(() => this.$refs.formAdicionarContato.resetValidation());
+          }
+        }
+      },
+      methods: {
+        salvarContato: function () {
+          this.contatos.push(this.adicionarContato.dados);
+          this.adicionarContato.mostrarDialogo = false;
+        }
       }
     })
-
-
 
   </script>
 </body>
