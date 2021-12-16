@@ -49,7 +49,7 @@
                       <v-btn @click="edicaoContato.mostrarDialogo = false">Cancelar</v-btn>
                       <v-btn v-if="edicaoContato.novoContato" color="primary" :disabled="!edicaoContato.dadosValidos" @click="salvarContato">Adicionar
                       </v-btn>
-                      <v-btn v-else color="primary" :disabled="!edicaoContato.dadosValidos" @click="salvarContato">Editar
+                      <v-btn v-else color="primary" :disabled="!edicaoContato.dadosValidos" @click="salvarContato">Salvar
                       </v-btn>
                     </v-card-actions>
                   </v-card>
