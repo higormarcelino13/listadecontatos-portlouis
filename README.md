@@ -1,6 +1,6 @@
 # Lista de Contatos - Port Louis
 - Esta aplicação foi desenvolvida para o teste de pessoa desenvolvedora front-end na Port-Louis
-Link: https://listadecontatos.netlify.app/
+- Link: https://listadecontatos.netlify.app/
 
 # Requisitos
  - Botão de adicionar novo contato (escrito adicionar ou simbolo “+”)
